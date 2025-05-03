@@ -6,9 +6,9 @@ import (
 	"runtime"
 	"strings"
 
-	"time"
-
 	"github.com/p4-pankaj/trace-replay/models"
+
+	"time"
 )
 
 type InMemoryLogWriter struct {

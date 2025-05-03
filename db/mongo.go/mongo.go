@@ -4,11 +4,12 @@ import (
 	"context"
 	"log"
 
-	"time"
-
-	"github.com/p4-pankaj/trace-replay/config"
 	"github.com/p4-pankaj/trace-replay/constants"
 	"github.com/p4-pankaj/trace-replay/models"
+	"github.com/p4-pankaj/trace-replay/traceConfig"
+
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -18,7 +19,7 @@ import (
 const traceDbName = "myAppDatabase"
 const traceCollectionName = "traceCol"
 
-func NewMongoDb(conf *config.MongoConfig) (db *MongoDatabase, err error) {
+func NewMongoDb(conf *traceConfig.MongoConfig) (db *MongoDatabase, err error) {
 	clientOptions := options.Client().ApplyURI(conf.URI)
 	ctx, cancel := context.WithTimeout(context.Background(),
 		time.Duration(conf.ConnectTimeout)*time.Second)
@@ -69,7 +70,7 @@ func (m *MongoDatabase) GetTraceByID(ctx context.Context,
 	traceID string) (*models.TraceRecord, error) {
 	collection := m.client.Database(traceDbName).Collection(traceCollectionName)
 
-	filter := bson.D{{Key: "_id", Value: traceID}}
+	filter := bson.D{{Key: "trace_id", Value: traceID}}
 
 	var trace models.TraceRecord
 	err := collection.FindOne(ctx, filter).Decode(&trace)
@@ -77,7 +78,7 @@ func (m *MongoDatabase) GetTraceByID(ctx context.Context,
 		if err == mongo.ErrNoDocuments {
 			log.Printf("%s: trace not found for ID: %s",
 				constants.PkgTitle, traceID)
-			return nil, nil // Return nil if not found
+			return nil, nil
 		}
 		log.Printf("%s: failed to retrieve trace for ID %s: %v",
 			constants.PkgTitle, traceID, err)

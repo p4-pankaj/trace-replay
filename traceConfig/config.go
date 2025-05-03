@@ -1,4 +1,4 @@
-package config
+package traceConfig
 
 type dbKind int
 
@@ -6,7 +6,15 @@ const (
 	MongoDbType dbKind = iota
 )
 
-type Config struct{}
+type TraceConfig struct {
+	Env         string       `json:"env"`
+	DbConfig    *DbConfig    `json:"dbConfig"`
+	DebugConfig *DebugConfig `json:"debugConfig"`
+}
+
+type DebugConfig struct {
+	TraceId string `json:"traceId"`
+}
 
 type DbConfig struct {
 	DbKind      dbKind       `json:"dbKind"`
